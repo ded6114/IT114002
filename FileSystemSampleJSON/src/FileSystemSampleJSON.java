@@ -114,8 +114,10 @@ public class FileSystemSampleJSON  {
 				map.put("city", "Nowhere");
 				map.put("state", "Bliss");
 				map.put("zip", "01010");
+				map.put("Town","Sunshine");
 				//we're adding the map under a single key here
 				jo.put("fulladdress", map);
+				jo.put("town", map); 
 				//json object is ready to save; write it to the file
 				writeToFile(jsonFile, jo.toJSONString());
 				//use this to view the file contents in the console

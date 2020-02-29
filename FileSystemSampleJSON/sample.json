@@ -1,1 +1,1 @@
-{"fulladdress":{"address":"123 Fake Street","city":"Nowhere","state":"Bliss","zip":"01010"},"name":"John","age":55}
+{"fulladdress":{"address":"123 Fake Street","city":"Nowhere","state":"Bliss","zip":"01010","Town":"Sunshine"},"town":{"address":"123 Fake Street","city":"Nowhere","state":"Bliss","zip":"01010","Town":"Sunshine"},"name":"John","age":55}
