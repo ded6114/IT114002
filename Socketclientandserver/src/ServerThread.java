@@ -8,10 +8,10 @@ public class ServerThread extends Thread{
 	private ObjectInputStream in;//from client
 	private ObjectOutputStream out;//to client
 	private boolean isRunning = false;
-	private SampleSocketServer server;//ref to our server so we can call methods on it
+	private SocketServer server;//ref to our server so we can call methods on it
 	//more easily
 	private String clientName = "Anon";
-	public ServerThread(Socket myClient, SampleSocketServer server) throws IOException {
+	public ServerThread(Socket myClient, SocketServer server) throws IOException {
 		this.client = myClient;
 		this.server = server;
 		isRunning = true;

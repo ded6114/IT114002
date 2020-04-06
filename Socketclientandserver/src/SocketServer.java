@@ -13,7 +13,7 @@ import java.util.Queue;
 
 import com.google.gson.Gson;
 
-public class SampleSocketServer {
+public class SocketServer {
 	int port = 3002;
 	public static boolean isRunning = true;
 	private List<ServerThread> clients = new ArrayList<ServerThread>();
@@ -27,7 +27,7 @@ public class SampleSocketServer {
 		saveScore(1000);
 		System.out.println("Waiting for client");
 		try (ServerSocket serverSocket = new ServerSocket(port);) {
-			while(SampleSocketServer.isRunning) {
+			while(SocketServer.isRunning) {
 				try {
 					Socket client = serverSocket.accept();
 					System.out.println("Client connecting...");
@@ -200,9 +200,10 @@ public class SampleSocketServer {
 			}
 		}
 		System.out.println("Starting Server");
-		SampleSocketServer server = new SampleSocketServer();
+		SocketServer server = new SocketServer();
 		System.out.println("Listening on port " + port);
 		server.start(port);
+	
 		System.out.println("Server Stopped");
 	}
 }

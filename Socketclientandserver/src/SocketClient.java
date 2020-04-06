@@ -5,7 +5,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
-public class SampleSocketClient {
+public class SocketClient {
 	Socket server;
 	
 	public void connect(String address, int port) {
@@ -166,7 +166,7 @@ public class SampleSocketClient {
 		}
 	}
 	public static void main(String[] args) {
-		SampleSocketClient client = new SampleSocketClient();
+		SocketClient client = new SocketClient();
 		client.connect("127.0.0.1", 3002);
 		try {
 			//if start is private, it's valid here since this main is part of the class
