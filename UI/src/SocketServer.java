@@ -1,5 +1,3 @@
-  
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -10,8 +8,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import com.google.gson.Gson;
-
 
 public class SocketServer {
 	int port = 3002;
@@ -19,8 +15,12 @@ public class SocketServer {
 	private List<ServerThread> clients = new ArrayList<ServerThread>();
 	//We'll use a queue and a thread to separate our chat history
 	Queue<String> messages = new LinkedList<String>();
-	public TextState state = new TextState();
-	
+	public GameState state = new GameState();
+	public static long ClientID = 0;
+	public synchronized long getNextId() {
+		ClientID++;
+		return ClientID;
+	}
 	public synchronized void toggleButton(Payload payload) {
 		if(state.isButtonOn && !payload.IsOn()) {
 			state.isButtonOn = false;
@@ -44,9 +44,10 @@ public class SocketServer {
 					//Server thread is the server's representation of the client
 					ServerThread thread = new ServerThread(client, this);
 					thread.start();
+					thread.setClientId(getNextId());
 					//add client thread to list of clients
 					clients.add(thread);
-					System.out.println("Client Fadded to clients pool");
+					System.out.println("Client added to clients pool");
 				}
 				catch(IOException e) {
 					e.printStackTrace();
@@ -175,7 +176,6 @@ public class SocketServer {
 		System.out.println("Server Stopped");
 	}
 }
-
-class TextState{
+class GameState{
 	boolean isButtonOn = false;
 }

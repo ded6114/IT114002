@@ -9,8 +9,8 @@ import java.util.Queue;
 
 public class SocketClient {
 	private Socket server;
-	private OnReceiveMessage listener;
-	public void registerListener(OnReceiveMessage listener) {
+	private OnReceive listener;
+	public void registerListener(OnReceive listener) {
 		this.listener = listener;
 	}
 	private Queue<Payload> toServer = new LinkedList<Payload>();
@@ -173,27 +173,40 @@ public class SocketClient {
 			System.out.println(
 					String.format("Client \"%s\" connected", payload.getMessage())
 			);
+			if(listener != null)
+			{
+				listener.onReceiveConnect(payload.getMessage());
+				
+			}
+			  
 			break;
 		case DISCONNECT:
 			System.out.println(
 					String.format("Client \"%s\" disconnected", payload.getMessage())
+					
 			);
+			if(listener != null)
+			{
+				listener.onReceiveDisconnect(payload.getMessage());
+				
+			}
+			  
 			break;
 		case MESSAGE:
 			System.out.println(
 					String.format("%s", payload.getMessage())
 			);
-			
+			if(listener != null)
+			{
+				listener.onReceiveMessage(payload.getMessage());
+				
+			}
+			  
 			break;
 		case STATE_SYNC:
 			System.out.println("Sync");
-			//break; //this state will drop down to next state
-		case SWITCH:
-			System.out.println("switch");
-			if (listener != null) {
-				listener.onReceived(payload.IsOn());
-			}
-			break;
+			break; //this state will drop down to next state
+		
 		default:
 			System.out.println("Unhandled payload type: " + payload.getPayloadType().toString());
 			break;
@@ -222,6 +235,3 @@ public class SocketClient {
 
 }
 
-interface OnReceiveMessage{
-	void onReceived(boolean isOn);
-}

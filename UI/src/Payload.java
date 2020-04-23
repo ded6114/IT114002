@@ -1,4 +1,3 @@
-
 import java.io.Serializable;
 public class Payload implements Serializable{
 	/**
@@ -10,8 +9,6 @@ public class Payload implements Serializable{
 	public void IsOn(boolean isOn) {
 		this.isOn = isOn;
 	}
-	
-	
 	public boolean IsOn() {
 		return this.isOn;
 	}
@@ -39,7 +36,7 @@ public class Payload implements Serializable{
 	}
 	@Override
 	public String toString() {
-		return String.format("Type[%s], Number[%s], Message[%s]",
-					getPayloadType().toString(), getNumber(), getMessage());
+		return String.format("Type[%s], isOn[%s], Number[%s], Message[%s]",
+					getPayloadType().toString(), IsOn()+"", getNumber(), getMessage());
 	}
 }
