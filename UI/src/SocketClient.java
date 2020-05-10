@@ -48,7 +48,7 @@ public class SocketClient {
 			return;
 		}
 		System.out.println("Client Started");
-		//listen to console, server in, and write to server out
+		
 		try(	ObjectOutputStream out = new ObjectOutputStream(server.getOutputStream());
 				ObjectInputStream in = new ObjectInputStream(server.getInputStream());){
 			Thread inputThread = new Thread() {
@@ -78,18 +78,17 @@ public class SocketClient {
 					}
 				}
 			};
-			inputThread.start();//start the thread
+			inputThread.start();
 			
-			//Thread to listen for responses from server so it doesn't block main thread
+			
 			Thread fromServerThread = new Thread() {
 				@Override
 				public void run() {
 					try {
 						Payload p;
-						//while we're connected, listen for payloads from server
+						
 						while(!server.isClosed() && (p = (Payload)in.readObject()) != null) {
-							//System.out.println(fromServer);
-							//processPayload(fromServer);
+						
 							fromServer.add(p);
 						}
 						System.out.println("Stopping server listen thread");
@@ -108,7 +107,7 @@ public class SocketClient {
 					}
 				}
 			};
-			fromServerThread.start();//start the thread
+			fromServerThread.start();
 			
 			
 			Thread payloadProcessor = new Thread(){
@@ -123,7 +122,7 @@ public class SocketClient {
 							try {
 								Thread.sleep(8);
 							} catch (InterruptedException e) {
-								// TODO Auto-generated catch block
+								
 								e.printStackTrace();
 							}
 						}
@@ -131,15 +130,13 @@ public class SocketClient {
 				}
 			};
 			payloadProcessor.start();
-			//Keep main thread alive until the socket is closed
-			//initialize/do everything before this line
+			
 			while(!server.isClosed()) {
 				Thread.sleep(50);
 			}
 			System.out.println("Exited loop");
-			System.exit(0);//force close
-			//TODO implement cleaner closure when server stops
-			//without this, it still waits for input before terminating
+			System.exit(0);
+			
 		}
 		catch(Exception e) {
 			e.printStackTrace();
@@ -160,6 +157,12 @@ public class SocketClient {
 		payload.IsOn(isOn);
 		toServer.add(payload);
 	}
+        public void disconnect(){
+                Payload payload = new Payload();
+		payload.setPayloadType(PayloadType.DISCONNECT);
+		payload.setMessage("");
+		toServer.add(payload);
+        }
 	public void sendMessage(String message) {
 		Payload payload = new Payload();
 		payload.setPayloadType(PayloadType.MESSAGE);
@@ -169,6 +172,9 @@ public class SocketClient {
 	private void processPayload(Payload payload) {
 		System.out.println(payload);
 		switch(payload.getPayloadType()) {
+                case  ACTIVE:
+                    listener.onReciveActive(payload.getMessage());
+                    break;
 		case CONNECT:
 			System.out.println(
 					String.format("Client \"%s\" connected", payload.getMessage())
@@ -185,11 +191,7 @@ public class SocketClient {
 					String.format("Client \"%s\" disconnected", payload.getMessage())
 					
 			);
-			if(listener != null)
-			{
-				listener.onReceiveDisconnect(payload.getMessage());
-				
-			}
+			
 			  
 			break;
 		case MESSAGE:
@@ -205,7 +207,7 @@ public class SocketClient {
 			break;
 		case STATE_SYNC:
 			System.out.println("Sync");
-			break; //this state will drop down to next state
+			break; 
 		
 		default:
 			System.out.println("Unhandled payload type: " + payload.getPayloadType().toString());
@@ -226,12 +228,13 @@ public class SocketClient {
 		SocketClient client = new SocketClient();
 		SocketClient.connect("127.0.0.1", 3001);
 		try {
-			//if start is private, it's valid here since this main is part of the class
+			
 			client.start();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
+}
+
 
 }
 

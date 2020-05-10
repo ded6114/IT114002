@@ -5,11 +5,12 @@ import java.net.Socket;
 
 public class ServerThread extends Thread{
 	private Socket client;
-	private ObjectInputStream in;//from client
-	private ObjectOutputStream out;//to client
+	private ObjectInputStream in;
+	private ObjectOutputStream out;
 	private boolean isRunning = false;
-	private SocketServer server;//ref to our server so we can call methods on it
-	//more easily
+	private SocketServer server;
+	private boolean isMuted=false;
+	
 	private String clientName = "Anon";
 	public ServerThread(Socket myClient, SocketServer server) throws IOException {
 		this.client = myClient;
@@ -18,15 +19,16 @@ public class ServerThread extends Thread{
 		out = new ObjectOutputStream(client.getOutputStream());
 		in = new ObjectInputStream(client.getInputStream());
 		
-		//let everyone know we're here...
-		//we actually can't do this here
-		//when we send the message, we aren't in the clients list yet
-		//so we won't see that we connected. Jump down to run()
-		//broadcastConnected();
-	}
-	public void setClientId(long id) {
+			}
+	
+        public void setClientId(long id) {
 		clientName += "_" + id;
 	}
+        
+        public String getClientName(){
+            return clientName;
+        }
+        
 	void syncStateToMyClient() {
 		System.out.println(this.clientName + " broadcast state");
 		Payload payload = new Payload();
@@ -35,7 +37,7 @@ public class ServerThread extends Thread{
 		try {
 			out.writeObject(payload);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 	}
@@ -43,20 +45,16 @@ public class ServerThread extends Thread{
 		System.out.println(this.clientName + " broadcast connected");
 		Payload payload = new Payload();
 		payload.setPayloadType(PayloadType.CONNECT);
-		//note we don't need to specify message as it'll be handle by the server
-		//for this case
-		//we can send our name instead of id
-		//server.broadcast(payload, this.getId());
+		payload.setMessage("Connected");
+               
 		server.broadcast(payload, this.clientName);
 	}
 	void broadcastDisconnected() {
-		//let everyone know we're here
+		
 		Payload payload = new Payload();
 		payload.setPayloadType(PayloadType.DISCONNECT);
-		//note we don't need to specify message as it'll be handle by the server
-		//for this case
-		//we can send our name instead of id
-		//server.broadcast(payload, this.getId());
+                payload.setMessage("Disconnected");
+		
 		server.broadcast(payload, this.clientName);
 	}
 	public boolean send(Payload payload) {
@@ -73,7 +71,7 @@ public class ServerThread extends Thread{
 	}
 	@Deprecated
 	public boolean send(String message) {
-		//added a boolean so we can see if the send was successful
+		
 		Payload payload = new Payload();
 		payload.setPayloadType(PayloadType.MESSAGE);
 		payload.setMessage(message);
@@ -82,30 +80,27 @@ public class ServerThread extends Thread{
 	@Override
 	public void run() {
 		try {
-			//here we can let people know. We should be on the list
-			//so we'll see that we connected
-			//if we're using client name then we can comment this part out and use
-			//it only when we get a connect payload from our client
-			//broadcastConnected();
+			
 			Payload fromClient;
 			while(isRunning 
 					&& !client.isClosed()
-					&& (fromClient = (Payload)in.readObject()) != null) {//open while loop
+					&& (fromClient = (Payload)in.readObject()) != null) {
 				processPayload(fromClient);
-			}//close while loop
+			}
 		}
 		catch(Exception e) {
 			e.printStackTrace();
 			System.out.println("Terminating Client");
 		}
 		finally {
-			//we're going to try to send our disconnect message, but it could fail
+			
 			broadcastDisconnected();
-			//TODO
+			
 			System.out.println("Server Cleanup");
 			cleanup();
 		}
 	}
+	
 	private void processPayload(Payload payload) {
 		System.out.println("Received from client: " + payload);
 		switch(payload.getPayloadType()) {
@@ -121,14 +116,15 @@ public class ServerThread extends Thread{
 			break;
 		case DISCONNECT:
 			System.out.println("Received disconnect");
+                        broadcastDisconnected();
+                        cleanup();
 			break;
 		case MESSAGE:
-			//we can just pass the whole payload onward
-			//payload.setMessage(WordBlackList.filter(payload.getMessage()));
+			
 			server.broadcast(payload, this.clientName);
 			break;
 		case SWITCH:
-			//whatever we get from the client, just tell everyone else, ok?
+			
 			payload.setMessage(this.clientName);
 			server.toggleButton(payload);
 			break;
@@ -154,5 +150,13 @@ public class ServerThread extends Thread{
 			try {client.close();}
 			catch(IOException e) {System.out.println("Client already closed");}
 		}
+	}
+
+	public boolean isMuted() {
+		return isMuted;
+	}
+
+	public void setMuted(boolean isMuted) {
+		this.isMuted = isMuted;
 	}
 }

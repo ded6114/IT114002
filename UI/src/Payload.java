@@ -1,8 +1,6 @@
 import java.io.Serializable;
 public class Payload implements Serializable{
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = -6625037986217386003L;
 	private String message;
 	private boolean isOn = false;
