@@ -9,9 +9,8 @@ public class ServerThread extends Thread{
 	private ObjectOutputStream out;
 	private boolean isRunning = false;
 	private SocketServer server;
-	private boolean isMuted=false;
-	
 	private String clientName = "Anon";
+	public boolean isMute = false;
 	public ServerThread(Socket myClient, SocketServer server) throws IOException {
 		this.client = myClient;
 		this.server = server;
@@ -119,8 +118,9 @@ public class ServerThread extends Thread{
                         broadcastDisconnected();
                         cleanup();
 			break;
-		case MESSAGE:
 			
+		case MESSAGE:
+			payload.setMessage(WordBlackList.filter(payload.getMessage()));
 			server.broadcast(payload, this.clientName);
 			break;
 		case SWITCH:
@@ -128,6 +128,11 @@ public class ServerThread extends Thread{
 			payload.setMessage(this.clientName);
 			server.toggleButton(payload);
 			break;
+			
+		case TOGGLE_MUTE:
+			isMute = !isMute;
+			break;
+			
 		default:
 			System.out.println("Unhandled payload type from client " + payload.getPayloadType());
 			break;
@@ -152,11 +157,11 @@ public class ServerThread extends Thread{
 		}
 	}
 
-	public boolean isMuted() {
-		return isMuted;
-	}
+	//public boolean isMuted() {
+		//return isMuted;
+	//}
 
-	public void setMuted(boolean isMuted) {
-		this.isMuted = isMuted;
-	}
+	//public void setMuted(boolean isMuted) {
+		//this.isMuted = isMuted;
+	//}
 }

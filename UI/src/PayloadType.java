@@ -4,5 +4,6 @@ public enum PayloadType {
 	MESSAGE,
 	SWITCH,
 	STATE_SYNC,
-        ACTIVE
+        ACTIVE, 
+        TOGGLE_MUTE, 
 }

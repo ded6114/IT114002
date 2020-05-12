@@ -1,4 +1,7 @@
 
+import java.awt.event.ActionEvent;
+
+import javax.swing.JButton;
 import javax.swing.text.DefaultCaret;
 
 
@@ -8,6 +11,7 @@ public class UIChat extends javax.swing.JFrame implements OnReceive {
     
     	private static final long serialVersionUID = 507030164269413483L;
 	static SocketClient client;
+	private JButton mute;
     public UIChat() {
         initComponents();
         DefaultCaret caret = (DefaultCaret)history.getCaret();
@@ -34,6 +38,7 @@ public class UIChat extends javax.swing.JFrame implements OnReceive {
         history = new javax.swing.JTextArea();
         connect = new javax.swing.JButton();
         disconnect = new javax.swing.JButton();
+          mute = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -85,7 +90,19 @@ public class UIChat extends javax.swing.JFrame implements OnReceive {
                 disconnectActionPerformed(evt);
             }
         });
+        
+        mute.setText("Mute");
+        mute.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                muteActionPerformed(evt);
+            }
 
+			private void muteActionPerformed(ActionEvent evt) {
+				// TODO Auto-generated method stub
+				
+			}
+        });
+        
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(

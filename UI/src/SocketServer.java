@@ -13,7 +13,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.applet.Applet;
 import java.awt.Font;
 import java.awt.Graphics;
-
+import java.util.Random;
+import java.lang.Math;
 
 public class SocketServer {
 	int port = 3002;
@@ -27,27 +28,37 @@ public class SocketServer {
 		ClientID++;
 		return ClientID;
 	}
-	public void processCommand(String message) {
+	public String processCommand(String message) {
         if (message == null) {
-        	return;
+        return null;
         }
-	if(message.contains("mute @")) {
-		
-		String[] partial = message.split("mute @");
-		if(partial.length >= 2) {
-			partial = partial[1].split(" ");
-			String user = partial[0];
-		
-			return ;
-		}
-			
-	}
-	if (message.contains("*") && message.contains(contains(" *"))){
-		 message = message.replaceAll("* ", "<b>");
-		 message = message.replaceAll("* ", "<b>");
-	}
-	
-	}
+ //Print random number        
+     
+if (message.contains("flip ")){
+	int rand=GenerateRandom.random();
+	message = message.concat(" " + Integer.toString (rand ));
+	return message;
+    }
+
+// Mute User
+if(message.contains("mute @")) {
+
+String[] partial = message.split("mute @");
+if(partial.length >= 2) {
+partial = partial[1].split(" ");
+String user = partial[0];
+//TODO broadcastToSingleUser(message, user);
+//return null;
+return user;
+}
+
+}
+if (message.contains("*") && message.contains(contains(" *"))){
+message = message.replaceAll("* ", "<b>");
+message = message.replaceAll("* ", "<b>");
+}
+return message;
+}
 	private CharSequence contains(String string) {
 		// TODO Auto-generated method stub
 		return null;
@@ -65,10 +76,18 @@ public class SocketServer {
 	
 	//Generate random integers 
 	
-	class GenerateRandom {
-	int int_random = ThreadLocalRandom.current().nextInt();  
-	}
+	static class GenerateRandom
+	{
+		public static int random()
+		{
+			double randomNumber = Math.random();
+		randomNumber = randomNumber * 101;
+		int randomInt = (int) randomNumber; 
+		System.out.println("user random is: " + randomInt);
+		return randomInt;
 	
+	}
+	}
 	//Create Bold and Italic font 
 	
 	public void paint(Graphics g) {
@@ -80,6 +99,7 @@ public class SocketServer {
 		 
 		 g.drawString("Bold & Italic Font Example", 10, 50);
 		 }
+	
 	
 	
 	private void start(int port) {
@@ -201,8 +221,7 @@ public class SocketServer {
 	
 
    
-     
-	public synchronized void broadcast(Payload payload) {
+ public synchronized void broadcast(Payload payload) {
 		System.out.println("Sending message to " + clients.size() + " clients");
 		
 		
@@ -214,6 +233,10 @@ public class SocketServer {
 		}
 		while(iter.hasNext()) {
 			ServerThread client = iter.next();
+			
+			if(client.isMute) {
+				continue;
+			}
 			boolean messageSent = client.send(payload);
 			if(!messageSent) {
 				
